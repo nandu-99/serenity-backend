@@ -24,13 +24,16 @@ router.post('/request-approval', upload.single('document'), async (req, res, nex
     }
 
     // Upload directly from buffer to Cloudinary
-    const result = await cloudinary.uploader.upload_stream(
-      { folder: 'therapist_docs' },
-      (error, result) => {
-        if (error) throw error;
-        return result;
-      }
-    ).end(buffer);
+    const result = await new Promise((resolve, reject) => {
+      const stream = cloudinary.uploader.upload_stream(
+        { folder: 'therapist_docs' },
+        (error, result) => {
+          if (error) reject(error);
+          else resolve(result);
+        }
+      );
+      stream.end(buffer);
+    });
 
     req.cloudinaryUrl = result.secure_url;
     return therapistController.requestApproval(req, res, next);
