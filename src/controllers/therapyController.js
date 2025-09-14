@@ -44,6 +44,11 @@ const createTherapy = async (req, res) => {
     }
   }
 
+  const randomMeetingId = Math.floor(
+    100000000 + Math.random() * 900000000,
+  );
+
+
   try {
     const therapy = await prisma.therapy.create({
       data: {
@@ -57,6 +62,7 @@ const createTherapy = async (req, res) => {
         recurrenceRangeEnd: recurrenceRangeEnd ? new Date(recurrenceRangeEnd) : null,
         duration,
         cost,
+        meetingLink: `https://zoom.us/j/${randomMeetingId}`,
         therapistId: req.user.userId
       },
     });

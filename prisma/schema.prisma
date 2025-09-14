@@ -50,6 +50,7 @@ model Therapy {
   scheduledAt   DateTime
   duration      Int?
   cost          Float?
+  meetingLink   String?
   recurrence          RecurrenceType? 
   recurrenceDay      Weekday?        // For WEEKLY, specifies the day of the week
   recurrenceRangeStart DateTime?      // Start of recurrence range (for DAILY, MONTHLY, YEARLY)
