@@ -1,0 +1,7 @@
+-- AlterTable
+ALTER TABLE `Therapy` ADD COLUMN `cost` DOUBLE NULL,
+    ADD COLUMN `duration` INTEGER NULL,
+    ADD COLUMN `recurrence` ENUM('DAILY', 'WEEKLY', 'MONTHLY', 'YEARLY') NULL,
+    ADD COLUMN `recurrenceDay` ENUM('MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY', 'SUNDAY') NULL,
+    ADD COLUMN `recurrenceRangeEnd` DATETIME(3) NULL,
+    ADD COLUMN `recurrenceRangeStart` DATETIME(3) NULL;

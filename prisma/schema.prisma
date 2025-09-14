@@ -1,0 +1,98 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            Int                @id @default(autoincrement())
+  fullName      String?
+  email         String             @unique
+  password      String
+  role          Role               @default(USER)
+  approved      Boolean            @default(false) // For therapists
+  rejected      Boolean            @default(false)
+  createdAt     DateTime           @default(now())
+  updatedAt     DateTime           @updatedAt
+  therapies     Therapy[]          @relation("TherapistTherapies")
+  bookings      Booking[]
+  therapistDetails TherapistDetails?
+}
+
+model TherapistDetails {
+  id              Int      @id @default(autoincrement())
+  userId          Int      @unique
+  firstName       String
+  lastName        String
+  email           String   
+  phoneNumber     String
+  bio             String?
+  experienceYears Int?
+  documentPath    String?  // Path to uploaded proof document
+  user            User     @relation(fields: [userId], references: [id])
+}
+
+enum Role {
+  ADMIN
+  THERAPIST
+  USER
+}
+
+model Therapy {
+  id            Int         @id @default(autoincrement())
+  therapistId   Int
+  title         String
+  description   String?
+  type          TherapyType
+  scheduledAt   DateTime
+  duration      Int?
+  cost          Float?
+  recurrence          RecurrenceType? 
+  recurrenceDay      Weekday?        // For WEEKLY, specifies the day of the week
+  recurrenceRangeStart DateTime?      // Start of recurrence range (for DAILY, MONTHLY, YEARLY)
+  recurrenceRangeEnd  DateTime?       // End of recurrence range (optional, for DAILY, MONTHLY, YEARLY)
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+  therapist     User        @relation("TherapistTherapies", fields: [therapistId], references: [id])
+  bookings      Booking[]
+}
+
+enum RecurrenceType {
+  DAILY
+  WEEKLY
+  MONTHLY
+  YEARLY
+}
+
+enum Weekday {
+  MONDAY
+  TUESDAY
+  WEDNESDAY
+  THURSDAY
+  FRIDAY
+  SATURDAY
+  SUNDAY
+}
+
+
+enum TherapyType {
+  YOGA_THERAPY
+  SPIRITUAL_THERAPY
+  INDIVIDUAL_THERAPY
+  GROUP_THERAPY
+  INDIVIDUAL 
+  MUSIC_THERAPY
+  ARTS_CRAFTS_THERAPY
+}
+
+model Booking {
+  id         Int      @id @default(autoincrement())
+  userId     Int
+  therapyId  Int
+  createdAt  DateTime @default(now())
+  user       User     @relation(fields: [userId], references: [id])
+  therapy    Therapy  @relation(fields: [therapyId], references: [id])
+}

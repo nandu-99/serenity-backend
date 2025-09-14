@@ -1,0 +1,5 @@
+-- DropIndex
+DROP INDEX `TherapistDetails_email_key` ON `TherapistDetails`;
+
+-- AlterTable
+ALTER TABLE `Therapy` MODIFY `type` ENUM('YOGA_THERAPY', 'SPIRITUAL_THERAPY', 'INDIVIDUAL_THERAPY', 'GROUP_THERAPY', 'INDIVIDUAL', 'MUSIC_THERAPY', 'ARTS_CRAFTS_THERAPY') NOT NULL;
