@@ -5,9 +5,8 @@ const roleMiddleware = require('../middlewares/roleMiddleware');
 const multer = require('multer');
 const sharp = require('sharp');
 const cloudinary = require('../config/cloudinary');
-const fs = require('fs');
 
-const upload = multer({ dest: 'uploads/' });
+const upload = multer({ storage: multer.memoryStorage() });
 const router = express.Router();
 
 router.use(authMiddleware);
@@ -15,22 +14,23 @@ router.use(roleMiddleware('THERAPIST'));
 
 router.post('/request-approval', upload.single('document'), async (req, res, next) => {
   try {
-    const filePath = req.file.path;
+    let buffer = req.file.buffer;
 
-    let compressedPath = filePath;
+    // Compress image if it's an image file
     if (req.file.mimetype.startsWith('image/')) {
-      compressedPath = `uploads/compressed-${Date.now()}.jpg`;
-      await sharp(filePath)
-        .jpeg({ quality: 70 }) 
-        .toFile(compressedPath);
+      buffer = await sharp(req.file.buffer)
+        .jpeg({ quality: 70 })
+        .toBuffer();
     }
 
-    const result = await cloudinary.uploader.upload(compressedPath, {
-      folder: 'therapist_docs',
-    });
-
-    fs.unlinkSync(filePath);
-    if (compressedPath !== filePath) fs.unlinkSync(compressedPath);
+    // Upload directly from buffer to Cloudinary
+    const result = await cloudinary.uploader.upload_stream(
+      { folder: 'therapist_docs' },
+      (error, result) => {
+        if (error) throw error;
+        return result;
+      }
+    ).end(buffer);
 
     req.cloudinaryUrl = result.secure_url;
     return therapistController.requestApproval(req, res, next);
