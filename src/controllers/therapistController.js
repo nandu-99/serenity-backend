@@ -1,6 +1,5 @@
 const { PrismaClient } = require('@prisma/client');
 const multer = require('multer');
-const upload = multer({ dest: 'uploads/' });
 
 const prisma = new PrismaClient();
 
